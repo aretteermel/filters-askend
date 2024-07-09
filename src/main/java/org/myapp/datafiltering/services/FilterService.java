@@ -28,7 +28,7 @@ public class FilterService {
         this.comparisonRepository = comparisonRepository;
     }
 
-    public List<FilterDto> getAllFilterDtos() {
+    public List<FilterDto> getAllFilters() {
         List<Filter> filters = filterRepository.findAll();
         return filters.stream()
                 .map(this::convertToFilterDto)

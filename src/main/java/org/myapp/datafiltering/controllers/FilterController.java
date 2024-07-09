@@ -18,7 +18,7 @@ public class FilterController {
 
     @GetMapping
     public List<FilterDto> getAllFilters() {
-        return filterService.getAllFilterDtos();
+        return filterService.getAllFilters();
     }
 
     @PostMapping
