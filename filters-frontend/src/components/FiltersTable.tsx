@@ -1,9 +1,9 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import {Filters} from "../stores/filter-store.ts";
+import {Filter} from '../stores/filter-store.ts';
 
 interface FiltersTableProps {
-    filters: Filters[];
+    filters: Filter[];
 }
 
 const FiltersTable: React.FC<FiltersTableProps> = ({ filters }) => {

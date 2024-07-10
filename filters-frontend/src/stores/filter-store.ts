@@ -1,7 +1,7 @@
 export class FilterStore {
     private baseUrl = 'http://localhost:8080';
 
-    async fetchFilters(): Promise<Filters[]> {
+    async fetchFilters(): Promise<Filter[]> {
         try {
             const response = await this.fetch(`${this.baseUrl}/api/filters`);
             return await response.json();
@@ -11,7 +11,7 @@ export class FilterStore {
         }
     }
 
-    async fetchTypes(): Promise<Types[]> {
+    async fetchTypes(): Promise<Type[]> {
         try {
             const response = await this.fetch(`${this.baseUrl}/api/types`);
             return await response.json();
@@ -21,7 +21,7 @@ export class FilterStore {
         }
     }
 
-    async fetchComparisons(): Promise<Comparisons[]> {
+    async fetchComparisons(): Promise<Comparison[]> {
         try {
             const response = await fetch(`${this.baseUrl}/api/comparisons`);
             return await response.json();
@@ -31,11 +31,18 @@ export class FilterStore {
         }
     }
 
-    async saveNewFilter(filterData: FilterData): Promise<void> {
+    async saveNewFilter(filterData: FilterData): Promise<Response> {
         try {
-            await this.post(`${this.baseUrl}/api/filters`, filterData);
+            const formattedFilterData = {
+                ...filterData,
+                criteria: filterData.criteria.map((criterion) => {
+                    return criterion;
+                })
+            };
+            return await this.post(`${this.baseUrl}/api/filters`, formattedFilterData);
         } catch (error) {
             console.error('Error adding new filter:', error);
+            throw error;
         }
     }
 
@@ -57,17 +64,17 @@ export class FilterStore {
     }
 }
 
-export interface Types {
+export interface Type {
     id: number;
     type: string;
 }
 
-export interface Comparisons {
+export interface Comparison {
     typeId: number;
     comparison: string;
 }
 
-export interface CriteriaRow {
+export interface Criteria {
     type: string;
     comparison: string;
     value: string;
@@ -75,11 +82,11 @@ export interface CriteriaRow {
 
 export interface FilterData {
     name: string;
-    criteria: CriteriaRow[];
+    criteria: Criteria[];
 }
 
-export interface Filters {
+export interface Filter {
     id: number;
     name: string;
-    criteria: CriteriaRow[];
+    criteria: Criteria[];
 }

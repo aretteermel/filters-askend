@@ -1,14 +1,14 @@
-import {useEffect, useState} from "react";
-import FilterModal from "./FilterModal.tsx";
-import {Button, Grid} from "@mui/material";
-import {Filters, FilterStore} from "../stores/filter-store.ts";
-import FiltersTable from "./FiltersTable.tsx";
+import {useEffect, useState} from 'react';
+import FilterModal from './FilterModal.tsx';
+import {Button, Grid} from '@mui/material';
+import {Filter, FilterStore} from '../stores/filter-store.ts';
+import FiltersTable from './FiltersTable.tsx';
 
 const store = new FilterStore();
 
 function HomePage() {
     const [open, setOpen] = useState(false);
-    const [filters, setFilters] = useState<Filters[]>([]);
+    const [filters, setFilters] = useState<Filter[]>([]);
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);

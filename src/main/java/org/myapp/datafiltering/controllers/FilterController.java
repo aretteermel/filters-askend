@@ -1,7 +1,10 @@
 package org.myapp.datafiltering.controllers;
 
+import jakarta.validation.Valid;
 import org.myapp.datafiltering.dtos.FilterDto;
 import org.myapp.datafiltering.services.FilterService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,8 +25,13 @@ public class FilterController {
     }
 
     @PostMapping
-    public FilterDto createFilter(@RequestBody FilterDto filterDto) {
-        return filterService.saveFilter(filterDto);
+    public ResponseEntity <?> createFilter(@Valid @RequestBody FilterDto filterDto) {
+        try{
+            FilterDto filter = filterService.saveFilter(filterDto);
+            return ResponseEntity.ok(filter);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
     }
 
 }

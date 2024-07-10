@@ -13,15 +13,16 @@ import {
 
 // @ts-ignore
 import ModalStyle from '../styles/ModalStyle.ts';
-import CriteriaStyle from "../styles/CriteriaStyle.ts";
-import {Comparisons, CriteriaRow, FilterData, FilterStore, Types} from '../stores/filter-store.js';
+import CriteriaStyle from '../styles/CriteriaStyle.ts';
+import {Comparison, Criteria, FilterData, FilterStore, Type} from '../stores/filter-store.js';
 // @ts-ignore
 import React, {useEffect, useState} from 'react';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
+import CloseButtonStyle from '../styles/CloseButtonStyle.ts';
+import AddRowStyle from '../styles/AddRowStyle.ts';
+import RadioStyle from '../styles/RadioStyle.ts';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
-import CloseButtonStyle from "../styles/CloseButtonStyle.ts";
-import AddRowStyle from "../styles/AddRowStyle.ts";
-import RadioStyle from "../styles/RadioStyle.ts";
+import {format} from 'date-fns';
 
 const store = new FilterStore();
 
@@ -32,9 +33,9 @@ interface FilterModalProps {
 }
 
 const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) => {
-    const [typesData, setTypesData] = useState<Types[]>([]);
-    const [comparisonsData, setComparisonsData] = useState<Comparisons[]>([]);
-    const [rows, setRows] = useState<CriteriaRow[]>([{type: '', comparison: '', value: ''}]);
+    const [typesData, setTypesData] = useState<Type[]>([]);
+    const [comparisonsData, setComparisonsData] = useState<Comparison[]>([]);
+    const [rows, setRows] = useState<Criteria[]>([{type: '', comparison: '', value: ''}]);
     const [filterName, setFilterName] = useState<string>('')
     const [selectedFilterIndex, setSelectedFilterIndex] = React.useState<number>(-1);
 
@@ -58,7 +59,7 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
         }
     };
 
-    const prefillComparison = (selectedType: string, comparisons: Comparisons[]) => {
+    const prefillComparison = (selectedType: string, comparisons: Comparison[]) => {
         if (selectedType === 'Amount') {
             return comparisons.find(c => c.comparison === 'Equal')?.comparison || '';
         } else if (selectedType === 'Title') {
@@ -94,7 +95,7 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
 
     const handleDateChange = (index: number) => (date: Date | null) => {
         const newRows = [...rows];
-        newRows[index].value = date ? date.toISOString() : '';
+        newRows[index].value = date ? format(date, 'yyyy-MM-dd') : '';
         setRows(newRows);
     };
 
@@ -118,13 +119,17 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
         };
 
         try {
-            await store.saveNewFilter(filterData);
+            const response = await store.saveNewFilter(filterData);
 
+            if (response.ok) {
             console.log('Filter data submitted successfully');
             setFilterName('');
             setRows([{type: 'Amount', comparison: 'Equal', value: ''}]);
             closeModal();
             window.location.reload();
+            } else {
+                console.error('Error submitting filter data: ', response.statusText);
+            }
         } catch (error) {
             console.error('Error submitting filter data:', error);
         }
@@ -169,6 +174,7 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
                     label="Value"
                     fullWidth
                     variant="outlined"
+                    required
                 />
             );
         } else if (type === 'Title') {
@@ -180,6 +186,7 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
                     label="Value"
                     fullWidth
                     variant="outlined"
+                    required
                 />
             );
         } else if (type === 'Date') {
@@ -189,6 +196,7 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
                         label="Value"
                         value={value ? new Date(value) : null}
                         onChange={(date) => handleDateChange(index)(date)}
+                        slotProps={{ textField: { required: true }}}
                     />
                 </LocalizationProvider>
             );
@@ -201,6 +209,7 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
                 label="Value"
                 fullWidth
                 variant="outlined"
+                required
             />
         );
     };
@@ -210,7 +219,6 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
         setSelectedFilterIndex(selectedIndex);
         const selectedFilter = filters[selectedIndex];
         if (selectedFilter) {
-            setFilterName(selectedFilter.name);
             setRows(selectedFilter.criteria.map(criterion => ({
                 type: criterion.type,
                 comparison: criterion.comparison,
@@ -225,7 +233,7 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
                 <form onSubmit={handleSubmit}>
                     <Grid container rowSpacing={2}>
                         <Grid item minWidth={'min-content'} sx={{...CloseButtonStyle}}>
-                            <Button variant="contained" onClick={closeModal}>X</Button>
+                            <Button variant="contained" onClick={handleClose}>X</Button>
                         </Grid>
                         <Grid item xs={12}>
                             <Grid container>
@@ -240,6 +248,7 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
                                         label="Name"
                                         fullWidth
                                         variant="outlined"
+                                        required
                                     />
                                 </Grid>
                             </Grid>
