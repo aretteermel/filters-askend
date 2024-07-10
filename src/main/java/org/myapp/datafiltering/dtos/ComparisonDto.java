@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TypeDto {
-    private Long id;
-    private String type;
+public class ComparisonDto {
+    private Long typeId;
+    private String comparison;
 }

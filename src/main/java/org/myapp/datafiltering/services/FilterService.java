@@ -47,6 +47,8 @@ public class FilterService {
             filter.setCriteria(criteriaList);
         }
 
+        // TODO add check for right type and comparison
+
         Filter savedFilter = filterRepository.save(filter);
         return convertToFilterDto(savedFilter);
     }

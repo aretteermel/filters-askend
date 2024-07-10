@@ -26,6 +26,7 @@ public class TypeService {
 
     private TypeDto getType(Type type) {
         TypeDto typeDto = new TypeDto();
+        typeDto.setId(type.getId());
         typeDto.setType(type.getType());
         return typeDto;
     }
