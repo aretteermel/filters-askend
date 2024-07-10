@@ -27,16 +27,17 @@ function HomePage() {
     };
 
     return (
-        <Grid container>
-            <Grid item xs={12}>
+        <Grid container alignItems="center" justifyContent="space-between">
+            <Grid item xs={5}>
+                <h1>Filters List</h1>
+            </Grid>
+            <Grid item xs={5} textAlign="right">
                 <Button variant="contained" onClick={handleOpen}>Add new filter</Button>
             </Grid>
             <Grid item xs={12}>
-                <h1>Filters List</h1>
-                <FiltersTable filters={filters}/>
+                <FiltersTable filters={filters} />
             </Grid>
-
-            <FilterModal isOpen={open} closeModal={handleClose} filters={filters}/>
+            <FilterModal isOpen={open} closeModal={handleClose} filters={filters} />
         </Grid>
     );
 }

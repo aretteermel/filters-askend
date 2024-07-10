@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import {Filter} from '../stores/filter-store.ts';
 
 interface FiltersTableProps {
@@ -8,12 +8,12 @@ interface FiltersTableProps {
 
 const FiltersTable: React.FC<FiltersTableProps> = ({ filters }) => {
     return (
-        <TableContainer component={Paper}>
+        <TableContainer>
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell>ID</TableCell>
-                        <TableCell>Name</TableCell>
+                        <TableCell><strong>ID</strong></TableCell>
+                        <TableCell><strong>Filter name</strong></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

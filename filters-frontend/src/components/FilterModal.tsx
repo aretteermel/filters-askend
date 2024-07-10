@@ -11,18 +11,14 @@ import {
     TextField
 } from '@mui/material';
 
-// @ts-ignore
 import ModalStyle from '../styles/ModalStyle.ts';
 import CriteriaStyle from '../styles/CriteriaStyle.ts';
 import {Comparison, Criteria, FilterData, FilterStore, Type} from '../stores/filter-store.js';
-// @ts-ignore
 import React, {useEffect, useState} from 'react';
-import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import CloseButtonStyle from '../styles/CloseButtonStyle.ts';
 import AddRowStyle from '../styles/AddRowStyle.ts';
-import RadioStyle from '../styles/RadioStyle.ts';
-import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {format} from 'date-fns';
+import InputRenderer from './InputRenderer.tsx';
 
 const store = new FilterStore();
 
@@ -60,12 +56,12 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
     };
 
     const prefillComparison = (selectedType: string, comparisons: Comparison[]) => {
-        if (selectedType === 'Amount') {
-            return comparisons.find(c => c.comparison === 'Equal')?.comparison || '';
-        } else if (selectedType === 'Title') {
-            return comparisons.find(c => c.comparison === 'Starts with')?.comparison || '';
-        } else if (selectedType === 'Date') {
-            return comparisons.find(c => c.comparison === 'From')?.comparison || '';
+        if (selectedType === typesData[0].type) {
+            return comparisons.find(c => c.comparison === comparisons[0].comparison)?.comparison || '';
+        } else if (selectedType === typesData[1].type) {
+            return comparisons.find(c => c.comparison === comparisons[6].comparison)?.comparison || '';
+        } else if (selectedType === typesData[2].type) {
+            return comparisons.find(c => c.comparison === comparisons[9].comparison)?.comparison || '';
         }
         return '';
     };
@@ -124,7 +120,7 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
             if (response.ok) {
             console.log('Filter data submitted successfully');
             setFilterName('');
-            setRows([{type: 'Amount', comparison: 'Equal', value: ''}]);
+            setRows([{type: typesData[0].type, comparison: comparisonsData[0].comparison, value: ''}]);
             closeModal();
             window.location.reload();
             } else {
@@ -137,7 +133,7 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
 
     const handleClose = () => {
         setFilterName('');
-        setRows([{type: 'Amount', comparison: 'Equal', value: ''}]);
+        setRows([{type: typesData[0].type, comparison: comparisonsData[0].comparison, value: ''}]);
         setSelectedFilterIndex(-1);
         closeModal();
     };
@@ -162,56 +158,6 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
             return comparisonsData.filter(c => c.typeId === selectedType.id);
         }
         return [];
-    };
-
-    const renderValueInput = (type: string, value: string, index: number) => {
-        if (type === 'Amount') {
-            return (
-                <TextField
-                    type="number"
-                    value={value}
-                    onChange={handleValueChange(index)}
-                    label="Value"
-                    fullWidth
-                    variant="outlined"
-                    required
-                />
-            );
-        } else if (type === 'Title') {
-            return (
-                <TextField
-                    type="text"
-                    value={value}
-                    onChange={handleValueChange(index)}
-                    label="Value"
-                    fullWidth
-                    variant="outlined"
-                    required
-                />
-            );
-        } else if (type === 'Date') {
-            return (
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                    <DatePicker
-                        label="Value"
-                        value={value ? new Date(value) : null}
-                        onChange={(date) => handleDateChange(index)(date)}
-                        slotProps={{ textField: { required: true }}}
-                    />
-                </LocalizationProvider>
-            );
-        }
-        return (
-            <TextField
-                type="text"
-                value={value}
-                onChange={handleValueChange(index)}
-                label="Value"
-                fullWidth
-                variant="outlined"
-                required
-            />
-        );
     };
 
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -298,9 +244,14 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
                                                 </FormControl>
                                             </Grid>
                                             <Grid item xs={3}>
-                                                <FormControl variant="outlined" fullWidth>
-                                                    {renderValueInput(row.type, row.value, index)}
-                                                </FormControl>
+                                                <InputRenderer
+                                                    type={row.type}
+                                                    value={row.value}
+                                                    index={index}
+                                                    handleValueChange={handleValueChange}
+                                                    handleDateChange={handleDateChange}
+                                                    typesData={typesData}
+                                                />
                                             </Grid>
                                             <Grid item minWidth="min-content">
                                                 <Button variant="contained" onClick={() => removeRow(index)}
@@ -317,11 +268,11 @@ const FilterModal: React.FC<FilterModalProps> = ({isOpen, closeModal, filters}) 
                         <Grid item xs={2}>
                             <InputLabel>Selection</InputLabel>
                         </Grid>
-                        <Grid item xs={10} sx={{...RadioStyle}}>
+                        <Grid item xs={10}>
                             <RadioGroup row aria-label="filter-template" name="filter-template"
                                         value={selectedFilterIndex.toString()} onChange={handleRadioChange}>
                                 {filters.slice(0, 3).map((filter, index) => (
-                                    <FormControlLabel key={index} value={index.toString()} control={<Radio/>}
+                                    <FormControlLabel key={index} value={index.toString()} control={<Radio />}
                                                       label={filter.name}/>
                                 ))}
                             </RadioGroup>
